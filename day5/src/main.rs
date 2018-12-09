@@ -1,4 +1,12 @@
+#![feature(test)]
+
+extern crate rayon;
+extern crate test;
+
 use std::collections::VecDeque;
+use rayon::prelude::*;
+
+
 
 fn main() {
     let input = include_str!("input.txt");
@@ -38,7 +46,7 @@ fn star_two(input: VecDeque<char>) {
         's', 't', 'u', 'v', 'w', 'x',
         'y', 'z'];
 
-    let result = alphabet.iter()
+    let result = alphabet.par_iter()
         .map(|char_to_remove| {
             let mut deque:  VecDeque<char> = VecDeque::new();
             for c in input.iter() {
@@ -50,4 +58,21 @@ fn star_two(input: VecDeque<char>) {
         })
         .min();
     println!("Day 5 - Part 2 : {}", result.unwrap());
+}
+
+#[cfg(test)]
+mod benchs {
+    use super::*;
+    use test::Bencher;
+
+    #[bench]
+    fn benching(b: &mut Bencher) {
+        let input = include_str!("input.txt");
+
+        b.iter(|| {
+            let reduced_polymer = star_one(input);
+            star_two(reduced_polymer);
+        });
+
+    }
 }
